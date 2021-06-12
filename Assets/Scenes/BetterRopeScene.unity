@@ -225,7 +225,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 237570189}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.05, y: -2.66, z: -7.090359}
+  m_LocalPosition: {x: -10.09, y: 1.46, z: -7.090359}
   m_LocalScale: {x: 0.72535974, y: 8.913356, z: 0.72535974}
   m_Children: []
   m_Father: {fileID: 0}
@@ -353,6 +353,7 @@ GameObject:
   - component: {fileID: 529692841}
   - component: {fileID: 529692840}
   - component: {fileID: 529692845}
+  - component: {fileID: 529692846}
   m_Layer: 9
   m_Name: Spirit
   m_TagString: Spirit
@@ -454,7 +455,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529692839}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.64, y: -2.91, z: 0}
+  m_LocalPosition: {x: -4.05, y: 1.92, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1557063985}
@@ -473,7 +474,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b88001a28fe89274e9a871c98c8b92d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  circularForce: 10
+  maxMoveSpeed: 5
+  stopSmoothing: 0.31
+  jumpHeight: 2
+  jumpDuration: 0.31
+  jumpStopSmoothing: 0.69
+  wallKickAmplitude: 1.5
+  wallKickJumpHeight: 2
+  wallSlideSpeed: 0
+  wallSlowdownSmoothing: 0
+  dashLength: 4
+  dashDuration: 0.25
+  dashCooldown: 0.1
+  swingForce: 10
+  spiritDelay: 0.5
+  circularForce: 5
+  minCircularLength: 4
+  circularTransactionSmoothing: 0.95
+--- !u!232 &529692846
+DistanceJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529692839}
+  m_Enabled: 0
+  serializedVersion: 4
+  m_EnableCollision: 0
+  m_ConnectedRigidBody: {fileID: 0}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_AutoConfigureConnectedAnchor: 0
+  m_Anchor: {x: 0, y: 0}
+  m_ConnectedAnchor: {x: 0, y: 0}
+  m_AutoConfigureDistance: 1
+  m_Distance: 10.270468
+  m_MaxDistanceOnly: 0
 --- !u!1 &1397155761
 GameObject:
   m_ObjectHideFlags: 0
@@ -590,7 +626,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1397155761}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24.93, y: -9.55, z: 0}
+  m_LocalPosition: {x: 7.41, y: 1.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -640,7 +676,7 @@ DistanceJoint2D:
   m_BreakTorque: Infinity
   m_AutoConfigureConnectedAnchor: 0
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: -11.202499, y: -4.394858}
+  m_ConnectedAnchor: {x: -11.072265, y: 0.4899974}
   m_AutoConfigureDistance: 0
   m_Distance: 0.005
   m_MaxDistanceOnly: 0
@@ -980,7 +1016,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1838092664}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.06, y: -1.72, z: 0}
+  m_LocalPosition: {x: 1.74, y: 0.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

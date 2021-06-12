@@ -14,8 +14,10 @@ public class Rope : MonoBehaviour
     private GameObject[] ropeSegments;
     private LineRenderer lineRenderer;
     private Rigidbody2D playerRb;
+    private Rigidbody2D spiritRb;
     private DistanceJoint2D playerJoint;
     private PlayerMovement playerMovement;
+    private SpiritMovement spiritMovement;
     private bool[] segmentCollisions;
     private float segmentLength;
     void Start()
@@ -48,6 +50,8 @@ public class Rope : MonoBehaviour
         DistanceJoint2D  distJoint;
         //Connect spirit to first rope segment
         GameObject playerObj = GameObject.Find("Spirit");
+        spiritMovement = playerObj.GetComponent<SpiritMovement>();
+        spiritRb = playerObj.GetComponent<Rigidbody2D>();
         ropeSegments[0].AddComponent<HingeJoint2D>();
         ropeSegments[0].AddComponent<DistanceJoint2D>();
         hingeJoint = ropeSegments[0].GetComponents<HingeJoint2D>()[0];
@@ -117,17 +121,22 @@ public class Rope : MonoBehaviour
         for(int i = 0; i < numSegments; i++) {
             if(segmentCollisions[i] && i < min) {
                 min = i;
-            } else if(segmentCollisions[i] && i > max) {
+            }
+            if(segmentCollisions[i] && i > max) {
                 max = i;
             }
         }
-        if(max > -1 && playerRb.position.y < ropeSegments[min].transform.position.y) {
+        if(max > -1 && playerRb.position.y < ropeSegments[max].transform.position.y) {
             playerMovement.SetCircularAnchor(ropeSegments[max].transform.position, max);
             playerMovement.SetCircularMovement(true);
-        } if(min < numSegments && playerRb.position.y < ropeSegments[min].transform.position.y) {
-            // playerMovement.SetCircularMovement(true);
-        } else if(min == numSegments && max == -1) {
+        }
+        if(min < numSegments && spiritRb.position.y < ropeSegments[min].transform.position.y) {
+            spiritMovement.SetCircularAnchor(ropeSegments[min].transform.position, min);
+            spiritMovement.SetCircularMovement(true);
+        }
+        if(min == numSegments && max == -1) {
             playerMovement.SetCircularMovement(false);
+            spiritMovement.SetCircularMovement(false);
         }
     }
 

@@ -99,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
 
         if(isJumping) {
             velocity.y = jumpSpeed;
-        } else if(isJumpingPast) {
+        } else if(isJumpingPast && !isJumping) {
             velocity.y *= jumpStopSmoothing;
         }
 
@@ -189,9 +189,8 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if(!jumpAvailable) {
-            jumpAvailable = (isGrounded && playerRb.velocity.y < 0)
-                            || (wallInfo != 0 && objectMoveDirection == wallInfo);
+        if(!jumpAvailable && !isJumping) {
+            jumpAvailable = isGrounded || (wallInfo != 0 && objectMoveDirection == wallInfo);
         }
 
         //Handle Input and Determine Next State
@@ -204,15 +203,6 @@ public class PlayerMovement : MonoBehaviour
         key_lockDown = Input.GetKeyDown("k");
         key_lock = Input.GetKey("k");
         userInputMoveDirection = Input.GetAxisRaw("Horizontal");
-
-        bool[] inputs = new bool[3];
-        inputs[0] = userInputMoveDirection > 0;
-        inputs[1] = userInputMoveDirection < 0;
-        inputs[2] = key_jump;
-
-        if(!key_lock && (userInputMoveDirection != 0 || key_jump)) {
-            spiritMovement.QueueInput(inputs, spiritDelay);
-        }
 
         if(dashAvailable && key_dashDown) {
             dashing = true;
@@ -234,6 +224,7 @@ public class PlayerMovement : MonoBehaviour
 
         if(key_lockDown) {
             spiritRb.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
+            spiritMovement.Lock();
             spiritMovement.EmptyQueue();
             circularJoint.connectedAnchor = spiritRb.position;
             anchorPosition = spiritRb.position;
@@ -242,6 +233,7 @@ public class PlayerMovement : MonoBehaviour
             circularMovement = true;
         } else if(spirit_lock && !key_lock) {
             spiritRb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            spiritMovement.UnLock();
             spirit_lock = false;
             circularJoint.enabled = false;
             circularMovement = false;
@@ -249,10 +241,15 @@ public class PlayerMovement : MonoBehaviour
     }
 
     bool IsGrounded() {
-        if(playerRb.velocity.y <= 0.05f) {
+        if(isJumping && airTime < 0.1f) {
+            return false;
+        }
+        if(playerRb.velocity.y <= 0.1f) {
+            Vector2 positionToCheck = transform.position;
+            positionToCheck.y -= playerCollider.size.y / 2;
+            /*
             int layerMask = LayerMask.GetMask("Ground");
             RaycastHit2D[] hits;
-            Vector2 positionToCheck = transform.position;
             Vector2 leftCheck = positionToCheck;
             leftCheck.x -= playerCollider.size.x / 2;
             Vector2 rightCheck = positionToCheck;
@@ -263,6 +260,10 @@ public class PlayerMovement : MonoBehaviour
                 return true;
             hits = Physics2D.RaycastAll(rightCheck, new Vector2 (0, -1), checkDistance, layerMask);
             return hits.Length > 0;
+            */
+            int layerMask = LayerMask.GetMask("Ground");
+            Collider2D[] collider = Physics2D.OverlapCircleAll(positionToCheck, 0.15f, layerMask);
+            return collider.Length > 0;
         }
         return false;
     }
@@ -311,7 +312,7 @@ public class PlayerMovement : MonoBehaviour
             circularMovement = true;
             anchorPosition = position;
             circularJoint.connectedAnchor = position;
-            circularJoint.distance = newDistance;
+            circularJoint.distance = ropeLength * (1 - segmentID / numSegments);
         } else {
             circularJoint.distance = ropeLength;
         }

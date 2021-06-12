@@ -13,12 +13,17 @@ public class Rope : MonoBehaviour
     private GameObject debuggerPrefab;
     private GameObject[] ropeSegments;
     private LineRenderer lineRenderer;
+    private Rigidbody2D playerRb;
+    private DistanceJoint2D playerJoint;
+    private PlayerMovement playerMovement;
+    private bool[] segmentCollisions;
     private float segmentLength;
     void Start()
     {
         ropeSegmentPrefab = (GameObject) Resources.Load("Prefabs/RopeSegment");
         debuggerPrefab = (GameObject) Resources.Load("Prefabs/Debugger");
         lineRenderer = GetComponent<LineRenderer>();
+        segmentCollisions = new bool[numSegments];
         lineRenderer.numCornerVertices = lineSmoothness;
         lineRenderer.useWorldSpace = true;
         lineRenderer.positionCount = numSegments;
@@ -33,29 +38,45 @@ public class Rope : MonoBehaviour
             curCollider.offset = new Vector2((end.x - start.x)/2, 0f);
             curCollider.size = new Vector2(segmentLength, ropeActualWidth);
             GameObject curObj = Instantiate(ropeSegmentPrefab, start, Quaternion.identity);
+            curObj.GetComponent<RopeSegment>().SetID(i);
             // Instantiate(debuggerPrefab, start, Quaternion.identity);
             ropeSegments[i] = curObj;
             start = end;
         }
         HingeJoint2D hingeJoint;
         Rigidbody2D nextSegmentrb;
-        // DistanceJoint2D  distJoint;
+        DistanceJoint2D  distJoint;
         //Connect spirit to first rope segment
         GameObject playerObj = GameObject.Find("Spirit");
         ropeSegments[0].AddComponent<HingeJoint2D>();
+        ropeSegments[0].AddComponent<DistanceJoint2D>();
         hingeJoint = ropeSegments[0].GetComponents<HingeJoint2D>()[0];
         nextSegmentrb = playerObj.GetComponent<Rigidbody2D>();
         ConnectHingeToRigid(hingeJoint, nextSegmentrb, segmentLength);
+        distJoint = ropeSegments[0].GetComponents<DistanceJoint2D>()[0];
+        distJoint.anchor  = hingeJoint.anchor;
+        distJoint.connectedAnchor = hingeJoint.connectedAnchor;
+        distJoint.connectedBody = nextSegmentrb;
+        distJoint.autoConfigureConnectedAnchor = false;
+        distJoint.distance = 0;
+        distJoint.enabled = true;
         //Connect 2nd end of first rope to next rope segment
         hingeJoint = ropeSegments[0].GetComponents<HingeJoint2D>()[1];
         nextSegmentrb = ropeSegments[1].GetComponent<Rigidbody2D>();
         ConnectHingeToRigid(hingeJoint, nextSegmentrb, segmentLength);
+        distJoint = ropeSegments[0].GetComponents<DistanceJoint2D>()[1];
+        distJoint.anchor  = hingeJoint.anchor;
+        distJoint.connectedAnchor = hingeJoint.connectedAnchor;
+        distJoint.connectedBody = nextSegmentrb;
+        distJoint.autoConfigureConnectedAnchor = false;
+        distJoint.distance = 0;
+        distJoint.enabled = true;
+        //Connect spirit to first rope segment
         //Connect rope segments together
         for(int i = 1; i < numSegments - 1; i++) {
             hingeJoint = ropeSegments[i].GetComponent<HingeJoint2D>();
             nextSegmentrb = ropeSegments[i+1].GetComponent<Rigidbody2D>();
             ConnectHingeToRigid(hingeJoint, nextSegmentrb, segmentLength);
-            /*  Currently not needed, seperated colliders and line drawing.
             distJoint = ropeSegments[i].GetComponent<DistanceJoint2D>();
             distJoint.anchor  = hingeJoint.anchor;
             distJoint.connectedAnchor = hingeJoint.connectedAnchor;
@@ -63,19 +84,50 @@ public class Rope : MonoBehaviour
             distJoint.autoConfigureConnectedAnchor = false;
             distJoint.distance = 0;
             distJoint.enabled = true;
-            */
         }
         //Connect last rope segment to player
         playerObj = GameObject.Find("Player");
         hingeJoint = ropeSegments[numSegments-1].GetComponent<HingeJoint2D>();
-        nextSegmentrb = playerObj.GetComponent<Rigidbody2D>();
-        ConnectHingeToRigid(hingeJoint, nextSegmentrb, segmentLength);
-        Physics2D.IgnoreLayerCollision(8, 8);
-        Physics2D.IgnoreLayerCollision(8, 9);
+        playerRb = playerObj.GetComponent<Rigidbody2D>();
+        playerMovement = playerObj.GetComponent<PlayerMovement>();
+        playerJoint = playerObj.GetComponent<DistanceJoint2D>();
+        playerJoint.enabled = false;
+        ConnectHingeToRigid(hingeJoint, playerRb, segmentLength);
+        /*
+        distJoint = ropeSegments[numSegments-1].GetComponent<DistanceJoint2D>();
+        distJoint.anchor  = hingeJoint.anchor;
+        distJoint.connectedAnchor = hingeJoint.connectedAnchor;
+        distJoint.connectedBody = nextSegmentrb;
+        distJoint.autoConfigureConnectedAnchor = false;
+        distJoint.distance = 0;
+        distJoint.enabled = true;
+        */
+        Physics2D.IgnoreLayerCollision(8, 8);   //Rope rope
+        Physics2D.IgnoreLayerCollision(8, 9);   //Rope player
     }
     void Update()
     {
+        HandleCollision();
         DrawRope();
+    }
+
+    void HandleCollision() {
+        int min = numSegments;
+        int max = -1;
+        for(int i = 0; i < numSegments; i++) {
+            if(segmentCollisions[i] && i < min) {
+                min = i;
+            } else if(segmentCollisions[i] && i > max) {
+                max = i;
+            }
+        }
+        if(max > -1 && playerRb.position.y < ropeSegments[max].transform.position.y) {
+            playerMovement.SetCircularMovement(true);
+        } if(min < numSegments && playerRb.position.y < ropeSegments[min].transform.position.y) {
+            playerMovement.SetCircularMovement(true);
+        } else if(min == numSegments && max == -1) {
+            playerMovement.SetCircularMovement(false);
+        }
     }
 
     void DrawRope() {
@@ -93,5 +145,18 @@ public class Rope : MonoBehaviour
         hingeJoint.autoConfigureConnectedAnchor = false;
         hingeJoint.enableCollision = true;
         hingeJoint.enabled = true;
+    }
+
+    void ConnectRelativeToRigid(HingeJoint2D relativeJoint, Rigidbody2D nextSegmentrb, float offset) {
+        relativeJoint.anchor = new Vector2(offset, 0);
+        relativeJoint.connectedAnchor = new Vector2(0, 0);
+        relativeJoint.connectedBody = nextSegmentrb;
+        relativeJoint.autoConfigureConnectedAnchor = false;
+        relativeJoint.enableCollision = true;
+        relativeJoint.enabled = true;
+    }
+
+    public void NotifyCollision(int ID, bool state) {
+        segmentCollisions[ID] = state;
     }
 }

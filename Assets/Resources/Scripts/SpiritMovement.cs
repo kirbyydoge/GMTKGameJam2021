@@ -5,6 +5,7 @@ using UnityEngine;
 public class SpiritMovement : MonoBehaviour
 {
     private Rigidbody2D spiritRb;
+    public float circularForce = 10f;
     private List<bool[]> inputQ;
     private List<float> delayQ;
     private bool[] curInput;
@@ -12,12 +13,14 @@ public class SpiritMovement : MonoBehaviour
     private const int MOVE_RIGHT = 0;
     private const int MOVE_LEFT = 1;
     private const int JUMP = 2;
+    private bool circularMovement;
     
     void Start()
     {
         spiritRb = GetComponent<Rigidbody2D>();
         inputQ = new List<bool[]>();
         delayQ = new List<float>();
+        circularMovement = false;
     }
 
     void FixedUpdate() {
@@ -36,6 +39,17 @@ public class SpiritMovement : MonoBehaviour
                 velocity.y = 6.45f;
             }
 
+            if(circularMovement) {
+                velocity.x = spiritRb.velocity.x;
+                velocity.y = spiritRb.velocity.y;
+                if(curInput[MOVE_RIGHT]) {
+                    spiritRb.AddForce(Vector2.right * circularForce);
+                }
+                if(curInput[MOVE_LEFT]) {
+                    spiritRb.AddForce(Vector2.left * circularForce);
+                }
+            }
+
             spiritRb.velocity = velocity;
         }
     }
@@ -52,6 +66,9 @@ public class SpiritMovement : MonoBehaviour
                 i--;
             }
         }   
+    }
+    public void SetCircularMovement(bool circularMovement) {
+        this.circularMovement = circularMovement;
     }
 
     public void EmptyQueue() {

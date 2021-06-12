@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D playerRb;
     private Rigidbody2D spiritRb;
     private CapsuleCollider2D playerCollider;
+    private DistanceJoint2D circularJoint;
     private SpiritMovement spiritMovement;
     
     //Action Variables
@@ -25,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     public float dashCooldown = 0.1f;
     public float swingForce = 10f;
     public float spiritDelay = 0.5f;
+    public float circularForce = 10f;
 
     //State Variables
     private bool mouse_fireDown;
@@ -41,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     private bool key_lockDown;
     private bool key_lock;
     private bool spirit_lock;
+    private bool circularMovement;
     private float dashDirection;
     private float userInputMoveDirection;
     private float objectMoveDirection;
@@ -51,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
     private float airTime;
     private float dashTime;
     private float dashSpeed;
+    private float ropeLength;
     private int wallKickDirection;
 
     void Start()
@@ -60,10 +64,13 @@ public class PlayerMovement : MonoBehaviour
         spiritRb = spirit.GetComponent<Rigidbody2D>();
         spiritMovement = spirit.GetComponent<SpiritMovement>();
         playerCollider = GetComponent<CapsuleCollider2D>();
+        circularJoint = GetComponent<DistanceJoint2D>();
+        ropeLength = GameObject.Find("Rope").GetComponent<Rope>().ropeLength;
         wallKick = false;
         dashAvailable = true;
         jumpAvailable = true;
         spirit_lock = false;
+        circularMovement = false;
         jumpSpeed = jumpHeight / jumpDuration;
         dashSpeed = dashLength / dashDuration;
         wallKickDuration = wallKickAmplitude / maxMoveSpeed;
@@ -101,6 +108,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if(wallInfo * userInputMoveDirection > 0) {
+            playerRb.AddForce(Vector2.up * Physics2D.gravity.magnitude * playerRb.gravityScale);
             if(velocity.y <= -wallSlideSpeed) {
                 velocity.y = -wallSlideSpeed;
             } else {
@@ -112,6 +120,14 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = 0;
             playerRb.AddForce(Vector2.up * Physics2D.gravity.magnitude * playerRb.gravityScale);
             velocity.x = dashDirection * dashSpeed;
+        }
+
+        if(circularMovement) {
+            velocity.x = playerRb.velocity.x;
+            velocity.y = playerRb.velocity.y;
+            if(userInputMoveDirection != 0) {
+                playerRb.AddForce(Vector2.right * userInputMoveDirection * circularForce);
+            }
         }
 
         playerRb.velocity = velocity;
@@ -201,10 +217,16 @@ public class PlayerMovement : MonoBehaviour
         if(key_lockDown) {
             spiritRb.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
             spiritMovement.EmptyQueue();
+            circularJoint.connectedAnchor = spiritRb.position;
+            circularJoint.distance = ropeLength;
+            circularJoint.enabled = true;
             spirit_lock = true;
+            circularMovement = true;
         } else if(spirit_lock && !key_lock) {
             spiritRb.constraints = RigidbodyConstraints2D.FreezeRotation;
             spirit_lock = false;
+            circularJoint.enabled = false;
+            circularMovement = false;
         }
     }
 
@@ -253,6 +275,10 @@ public class PlayerMovement : MonoBehaviour
         if(hits.Length > 0)
             return -1;  //Wall to the left
         return 0;   //No wall
+    }
+
+    public void SetCircularMovement(bool circularMovement) {
+        this.circularMovement = circularMovement || spirit_lock;
     }
 
     void RemoveHits(RaycastHit2D[] hits) {

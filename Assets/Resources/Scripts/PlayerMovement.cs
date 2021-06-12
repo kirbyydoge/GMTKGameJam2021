@@ -27,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
     public float swingForce = 10f;
     public float spiritDelay = 0.5f;
     public float circularForce = 10f;
+    public float minCircularLength = 4f;
+    [Range(0, 1)] public float circularTransactionSmoothing = 0.95f;
 
     //State Variables
     private bool mouse_fireDown;
@@ -34,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
     private bool key_jump;
     private bool key_jumpDown;
     private bool isJumping;
+    private bool isGrounded;
     private bool isJumpingPast;
     private bool jumpAvailable;
     private bool wallKick;
@@ -55,7 +58,10 @@ public class PlayerMovement : MonoBehaviour
     private float dashTime;
     private float dashSpeed;
     private float ropeLength;
+    private int numSegments;
     private int wallKickDirection;
+    private Vector2 anchorPosition;
+    private int curSegmment;
 
     void Start()
     {
@@ -65,7 +71,10 @@ public class PlayerMovement : MonoBehaviour
         spiritMovement = spirit.GetComponent<SpiritMovement>();
         playerCollider = GetComponent<CapsuleCollider2D>();
         circularJoint = GetComponent<DistanceJoint2D>();
+        circularJoint.enableCollision = true;
         ropeLength = GameObject.Find("Rope").GetComponent<Rope>().ropeLength;
+        numSegments = GameObject.Find("Rope").GetComponent<Rope>().numSegments;
+        curSegmment = -1;
         wallKick = false;
         dashAvailable = true;
         jumpAvailable = true;
@@ -92,6 +101,27 @@ public class PlayerMovement : MonoBehaviour
             velocity.y *= jumpStopSmoothing;
         }
 
+        if(dashing) {
+            velocity.y = 0;
+            playerRb.AddForce(Vector2.up * Physics2D.gravity.magnitude * playerRb.gravityScale);
+            velocity.x = dashDirection * dashSpeed;
+        }
+
+        if(circularMovement && !isGrounded) {
+            velocity.x = playerRb.velocity.x;
+            velocity.y = playerRb.velocity.y;
+            if((anchorPosition - playerRb.position).magnitude >= circularJoint.distance * circularTransactionSmoothing) {
+                circularJoint.enabled = wallInfo == 0;
+            } else {
+                circularJoint.enabled = false;
+            }
+            if(userInputMoveDirection != 0) {
+                playerRb.AddForce(Vector2.right * userInputMoveDirection * circularForce);
+            }
+        } else {
+            circularJoint.enabled = false;
+        }
+
         if(wallKick) {
             if(wallKickTime < wallKickDuration / 2) {
                 velocity.y = wallKickJumpSpeed;
@@ -116,20 +146,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if(dashing) {
-            velocity.y = 0;
-            playerRb.AddForce(Vector2.up * Physics2D.gravity.magnitude * playerRb.gravityScale);
-            velocity.x = dashDirection * dashSpeed;
-        }
-
-        if(circularMovement) {
-            velocity.x = playerRb.velocity.x;
-            velocity.y = playerRb.velocity.y;
-            if(userInputMoveDirection != 0) {
-                playerRb.AddForce(Vector2.right * userInputMoveDirection * circularForce);
-            }
-        }
-
         playerRb.velocity = velocity;
 
         isJumpingPast = isJumping;
@@ -139,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     { 
         //Update states
-        bool isGrounded = IsGrounded();
+        isGrounded = IsGrounded();
         int wallInfo = WallCheck();
         objectMoveDirection =   playerRb.velocity.x > 0 ? 1
                             :   playerRb.velocity.x < 0 ? -1
@@ -218,8 +234,8 @@ public class PlayerMovement : MonoBehaviour
             spiritRb.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
             spiritMovement.EmptyQueue();
             circularJoint.connectedAnchor = spiritRb.position;
+            anchorPosition = spiritRb.position;
             circularJoint.distance = ropeLength;
-            circularJoint.enabled = true;
             spirit_lock = true;
             circularMovement = true;
         } else if(spirit_lock && !key_lock) {
@@ -231,7 +247,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     bool IsGrounded() {
-        if(playerRb.velocity.y <= 0) {
+        if(playerRb.velocity.y <= 0.05f) {
             int layerMask = LayerMask.GetMask("Ground");
             RaycastHit2D[] hits;
             Vector2 positionToCheck = transform.position;
@@ -239,7 +255,7 @@ public class PlayerMovement : MonoBehaviour
             leftCheck.x -= playerCollider.size.x / 2;
             Vector2 rightCheck = positionToCheck;
             rightCheck.x += playerCollider.size.x / 2;
-            float checkDistance = playerCollider.size.y / 2 + 0.05f;
+            float checkDistance = playerCollider.size.y / 2 + 0.1f;
             hits = Physics2D.RaycastAll(leftCheck, new Vector2 (0, -1), checkDistance, layerMask);
             if(hits.Length > 0)
                 return true;
@@ -277,8 +293,27 @@ public class PlayerMovement : MonoBehaviour
         return 0;   //No wall
     }
 
+    public void SetCircularAnchor(Vector2 position, int segmentID) {
+        float newDistance = (position - playerRb.position).magnitude;
+        if  (   (segmentID > curSegmment) ||
+                (!circularMovement ||
+                newDistance < (anchorPosition - playerRb.position).magnitude &&
+                newDistance > minCircularLength)
+            ) {
+            curSegmment = segmentID;
+            circularMovement = true;
+            anchorPosition = position;
+            circularJoint.connectedAnchor = position;
+            circularJoint.distance = ropeLength * (1 - (float) segmentID / (numSegments - 1));
+        }
+    }
+
     public void SetCircularMovement(bool circularMovement) {
+        if(!circularMovement) {
+            this.circularJoint.connectedAnchor = spiritRb.position;
+        }
         this.circularMovement = circularMovement || spirit_lock;
+        this.circularJoint.enabled = this.circularMovement;
     }
 
     void RemoveHits(RaycastHit2D[] hits) {

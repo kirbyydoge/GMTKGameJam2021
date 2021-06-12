@@ -121,10 +121,11 @@ public class Rope : MonoBehaviour
                 max = i;
             }
         }
-        if(max > -1 && playerRb.position.y < ropeSegments[max].transform.position.y) {
+        if(max > -1 && playerRb.position.y < ropeSegments[min].transform.position.y) {
+            playerMovement.SetCircularAnchor(ropeSegments[max].transform.position, max);
             playerMovement.SetCircularMovement(true);
         } if(min < numSegments && playerRb.position.y < ropeSegments[min].transform.position.y) {
-            playerMovement.SetCircularMovement(true);
+            // playerMovement.SetCircularMovement(true);
         } else if(min == numSegments && max == -1) {
             playerMovement.SetCircularMovement(false);
         }

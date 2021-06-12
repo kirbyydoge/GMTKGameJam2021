@@ -29,9 +29,6 @@ public class Rope : MonoBehaviour
         Vector3 start = transform.position;
         for(int i = 0; i < numSegments; i++) {
             Vector3 end = start + Vector3.right * segmentLength;
-            RopeSegment curSegment = ropeSegmentPrefab.GetComponent<RopeSegment>();
-            curSegment.width = ropeActualWidth;
-            curSegment.length = segmentLength;
             BoxCollider2D curCollider = ropeSegmentPrefab.GetComponent<BoxCollider2D>();
             curCollider.offset = new Vector2((end.x - start.x)/2, 0f);
             curCollider.size = new Vector2(segmentLength, ropeActualWidth);

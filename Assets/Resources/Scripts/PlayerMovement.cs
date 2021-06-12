@@ -6,7 +6,9 @@ public class PlayerMovement : MonoBehaviour
 {
     //Components
     private Rigidbody2D playerRb;
+    private Rigidbody2D spiritRb;
     private CapsuleCollider2D playerCollider;
+    private SpiritMovement spiritMovement;
     
     //Action Variables
     public float maxMoveSpeed = 10f;
@@ -22,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     public float dashDuration = 0.25f;
     public float dashCooldown = 0.1f;
     public float swingForce = 10f;
+    public float spiritDelay = 0.5f;
 
     //State Variables
     private bool mouse_fireDown;
@@ -35,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
     private bool wallKickPast;
     private bool dashing;
     private bool dashAvailable;
+    private bool key_lockDown;
+    private bool key_lock;
+    private bool spirit_lock;
     private float dashDirection;
     private float userInputMoveDirection;
     private float objectMoveDirection;
@@ -50,14 +56,19 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
+        GameObject spirit = GameObject.Find("Spirit");
+        spiritRb = spirit.GetComponent<Rigidbody2D>();
+        spiritMovement = spirit.GetComponent<SpiritMovement>();
         playerCollider = GetComponent<CapsuleCollider2D>();
         wallKick = false;
         dashAvailable = true;
         jumpAvailable = true;
+        spirit_lock = false;
         jumpSpeed = jumpHeight / jumpDuration;
         dashSpeed = dashLength / dashDuration;
         wallKickDuration = wallKickAmplitude / maxMoveSpeed;
         wallKickJumpSpeed = wallKickJumpHeight / wallKickDuration;
+        Physics2D.IgnoreLayerCollision(9, 9);
     }
 
     void FixedUpdate()
@@ -156,7 +167,18 @@ public class PlayerMovement : MonoBehaviour
         mouse_fireDown = Input.GetMouseButtonDown(0);
         mouse_fire = Input.GetMouseButton(0);
         bool key_dashDown = Input.GetKeyDown(KeyCode.LeftShift);
+        key_lockDown = Input.GetKeyDown("k");
+        key_lock = Input.GetKey("k");
         userInputMoveDirection = Input.GetAxisRaw("Horizontal");
+
+        bool[] inputs = new bool[3];
+        inputs[0] = userInputMoveDirection > 0;
+        inputs[1] = userInputMoveDirection < 0;
+        inputs[2] = key_jump;
+
+        if(!key_lock && (userInputMoveDirection != 0 || key_jump)) {
+            spiritMovement.QueueInput(inputs, spiritDelay);
+        }
 
         if(dashAvailable && key_dashDown) {
             dashing = true;
@@ -174,6 +196,15 @@ public class PlayerMovement : MonoBehaviour
             airTime = 0;
         } else if(isJumping && !wallKick && !key_jump) {
             isJumping = false;
+        }
+
+        if(key_lockDown) {
+            spiritRb.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
+            spiritMovement.EmptyQueue();
+            spirit_lock = true;
+        } else if(spirit_lock && !key_lock) {
+            spiritRb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            spirit_lock = false;
         }
     }
 

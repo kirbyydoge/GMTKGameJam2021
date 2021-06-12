@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     //Components
     private Rigidbody2D playerRb;
     private Rigidbody2D spiritRb;
+    private GameObject debuggerPrefab;
     private CapsuleCollider2D playerCollider;
     private DistanceJoint2D circularJoint;
     private SpiritMovement spiritMovement;
@@ -67,6 +68,7 @@ public class PlayerMovement : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody2D>();
         GameObject spirit = GameObject.Find("Spirit");
+        debuggerPrefab = (GameObject) Resources.Load("Prefabs/Debugger");
         spiritRb = spirit.GetComponent<Rigidbody2D>();
         spiritMovement = spirit.GetComponent<SpiritMovement>();
         playerCollider = GetComponent<CapsuleCollider2D>();
@@ -293,24 +295,43 @@ public class PlayerMovement : MonoBehaviour
         return 0;   //No wall
     }
 
-    public void SetCircularAnchor(Vector2 position, int segmentID) {
-        float newDistance = (position - playerRb.position).magnitude;
-        if  (   (segmentID > curSegmment) ||
+    /*
+    if  (   (segmentID > curSegmment) ||
                 (!circularMovement ||
                 newDistance < (anchorPosition - playerRb.position).magnitude &&
                 newDistance > minCircularLength)
+            ) {
+    */
+    public void SetCircularAnchor(Vector2 position, int segmentID) {
+        float newDistance = (position - playerRb.position).magnitude;
+        if  (   (!key_lock && (segmentID > curSegmment)) ||
+                (RayCastControl(position))
             ) {
             curSegmment = segmentID;
             circularMovement = true;
             anchorPosition = position;
             circularJoint.connectedAnchor = position;
-            circularJoint.distance = ropeLength * (1 - (float) segmentID / (numSegments - 1));
+            circularJoint.distance = newDistance;
+        } else {
+            circularJoint.distance = ropeLength;
         }
     }
+
+    public bool RayCastControl(Vector2 position) {
+        int layerMask = LayerMask.GetMask("Wall", "Ground");
+        Collider2D collider = Physics2D.OverlapCircle(position, 0.5f, layerMask);
+        if(collider != null) {
+            float center = position.x - collider.transform.position.x;
+            float angle = Vector2.SignedAngle(position - playerRb.position, spiritRb.position - position);
+            return center * angle > 0;
+        }
+        return false;
+    } 
 
     public void SetCircularMovement(bool circularMovement) {
         if(!circularMovement) {
             this.circularJoint.connectedAnchor = spiritRb.position;
+            this.circularJoint.distance = ropeLength;
         }
         this.circularMovement = circularMovement || spirit_lock;
         this.circularJoint.enabled = this.circularMovement;

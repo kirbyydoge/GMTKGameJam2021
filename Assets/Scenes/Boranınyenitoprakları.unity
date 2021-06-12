@@ -692,7 +692,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxMoveSpeed: 5
   stopSmoothing: 0.31
-  jumpHeight: 10
+  jumpHeight: 5
   jumpDuration: 0.31
   jumpStopSmoothing: 0.69
   wallKickAmplitude: 1.5
@@ -862,7 +862,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxMoveSpeed: 5
   stopSmoothing: 0.31
-  jumpHeight: 10
+  jumpHeight: 5
   jumpDuration: 0.31
   jumpStopSmoothing: 0.69
   wallKickAmplitude: 1.5
@@ -950,7 +950,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8.361224
+  orthographic size: 14
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

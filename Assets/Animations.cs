@@ -7,6 +7,9 @@ public class Animations : MonoBehaviour
     // Start is called before the first frame update
     private Rigidbody2D playerRb;
     private Animator animPlayer;
+    private const float errorNumber=0.4f;
+    private 
+
 
     void Start()
     {
@@ -17,16 +20,19 @@ public class Animations : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(playerRb.velocity.x>0.01||playerRb.velocity.x<-0.01){
-            if(playerRb.velocity.y>0.05||playerRb.velocity.y<-0.05){
+        Debug.Log(Mathf.Round(playerRb.velocity.x)+" "+Mathf.Round(playerRb.velocity.y));
+        if(Mathf.Round(playerRb.velocity.x)>errorNumber){
+            transform.localRotation = Quaternion.Euler(0, 0, 0);
+            if(Mathf.Round(playerRb.velocity.y)>errorNumber||Mathf.Round(playerRb.velocity.y)<-errorNumber){
                 animPlayer.SetInteger("AnimationState",2);
             }
             else{
                 animPlayer.SetInteger("AnimationState",1);
             }
         }
-        else{
-            if(playerRb.velocity.y>0.05||playerRb.velocity.y<-0.05){
+        else if(Mathf.Round(playerRb.velocity.x)<-errorNumber){
+            transform.localRotation = Quaternion.Euler(0, 180, 0);
+            if(Mathf.Round(playerRb.velocity.y)>errorNumber||Mathf.Round(playerRb.velocity.y)<-errorNumber){
                 animPlayer.SetInteger("AnimationState",2);
             }
             else{

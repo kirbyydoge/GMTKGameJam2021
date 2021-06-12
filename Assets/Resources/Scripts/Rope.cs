@@ -5,7 +5,8 @@ using UnityEngine;
 public class Rope : MonoBehaviour
 {
     public float ropeLength = 10;
-    public float ropeWidth = 0.1f;
+    public float ropeActualWidth = 0.1f;
+    public float ropeVisualWidth = 0.15f;
     public int numSegments = 2;
     public int lineSmoothness = 10;
     private GameObject ropeSegmentPrefab;
@@ -21,19 +22,19 @@ public class Rope : MonoBehaviour
         lineRenderer.numCornerVertices = lineSmoothness;
         lineRenderer.useWorldSpace = true;
         lineRenderer.positionCount = numSegments;
-        lineRenderer.startWidth = ropeWidth;
-        lineRenderer.endWidth = ropeWidth;
+        lineRenderer.startWidth = ropeVisualWidth;
+        lineRenderer.endWidth = ropeVisualWidth;
         ropeSegments = new GameObject[numSegments];
         segmentLength = ropeLength / numSegments;
         Vector3 start = transform.position;
         for(int i = 0; i < numSegments; i++) {
             Vector3 end = start + Vector3.right * segmentLength;
             RopeSegment curSegment = ropeSegmentPrefab.GetComponent<RopeSegment>();
-            curSegment.width = ropeWidth;
+            curSegment.width = ropeActualWidth;
             curSegment.length = segmentLength;
             BoxCollider2D curCollider = ropeSegmentPrefab.GetComponent<BoxCollider2D>();
             curCollider.offset = new Vector2((end.x - start.x)/2, 0f);
-            curCollider.size = new Vector2(segmentLength, ropeWidth);
+            curCollider.size = new Vector2(segmentLength, ropeActualWidth);
             GameObject curObj = Instantiate(ropeSegmentPrefab, start, Quaternion.identity);
             // Instantiate(debuggerPrefab, start, Quaternion.identity);
             ropeSegments[i] = curObj;
@@ -64,7 +65,7 @@ public class Rope : MonoBehaviour
             distJoint.connectedBody = nextSegmentrb;
             distJoint.autoConfigureConnectedAnchor = false;
             distJoint.distance = 0;
-            distJoint.enabled = false;
+            distJoint.enabled = true;
             */
         }
         //Connect last rope segment to player
@@ -93,6 +94,7 @@ public class Rope : MonoBehaviour
         hingeJoint.connectedAnchor = new Vector2(0, 0);
         hingeJoint.connectedBody = nextSegmentrb;
         hingeJoint.autoConfigureConnectedAnchor = false;
+        hingeJoint.enableCollision = true;
         hingeJoint.enabled = true;
     }
 }

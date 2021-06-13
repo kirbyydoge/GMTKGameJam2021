@@ -11,7 +11,9 @@ public class SpiritMovement : MonoBehaviour
     private CapsuleCollider2D playerCollider;
     private DistanceJoint2D circularJoint;
     
-    //Action Variables
+    
+    [Header("Action Variables")]
+    [Space]
     public float maxMoveSpeed = 10f;
     [Range(0, 1)] public float stopSmoothing = 0f;
     public float jumpHeight = 5f;
@@ -28,6 +30,14 @@ public class SpiritMovement : MonoBehaviour
     public float circularForce = 10f;
     public float minCircularLength = 4f;
     [Range(0, 1)] public float circularTransactionSmoothing = 0.95f;
+
+    [Header("Collision Setup")]
+    [Space]
+    public Vector2 bottomOffset = new Vector2(0, -0.1f);
+    public Vector2 rightOffset = new Vector2(0.1f, 0);
+    public Vector2 leftOffset = new Vector2(-0.1f, 0);
+    public float groundCheckRadius = 0.1f;
+    public float wallCheckRadius = 0.1f;
 
     //State Variables
     private bool mouse_fireDown;
@@ -69,6 +79,8 @@ public class SpiritMovement : MonoBehaviour
     private bool isLocked;
     private bool flying;
 
+    private int wallInfo;
+
 
     void Start()
     {
@@ -98,8 +110,6 @@ public class SpiritMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        int wallInfo = WallCheck();
-
         Vector2 velocity = playerRb.velocity;
 
         if(!flying) {
@@ -166,8 +176,8 @@ public class SpiritMovement : MonoBehaviour
     void Update()
     { 
         //Update states
-        isGrounded = IsGrounded();
-        int wallInfo = WallCheck();
+        GroundCheck();
+        WallCheck();
         objectMoveDirection =   playerRb.velocity.x > 0 ? 1
                             :   playerRb.velocity.x < 0 ? -1
                             :   0;
@@ -245,60 +255,29 @@ public class SpiritMovement : MonoBehaviour
         }
     }
 
-    bool IsGrounded() {
+    void GroundCheck() {
         if(isJumping && airTime < 0.1f) {
-            return false;
+            isGrounded = false;
         }
         if(playerRb.velocity.y <= 0.1f) {
-            Vector2 positionToCheck = transform.position;
-            positionToCheck.y -= playerCollider.size.y / 2;
-            /*
             int layerMask = LayerMask.GetMask("Ground");
-            RaycastHit2D[] hits;
-            Vector2 leftCheck = positionToCheck;
-            leftCheck.x -= playerCollider.size.x / 2;
-            Vector2 rightCheck = positionToCheck;
-            rightCheck.x += playerCollider.size.x / 2;
-            float checkDistance = playerCollider.size.y / 2 + 0.1f;
-            hits = Physics2D.RaycastAll(leftCheck, new Vector2 (0, -1), checkDistance, layerMask);
-            if(hits.Length > 0)
-                return true;
-            hits = Physics2D.RaycastAll(rightCheck, new Vector2 (0, -1), checkDistance, layerMask);
-            return hits.Length > 0;
-            */
-            int layerMask = LayerMask.GetMask("Ground");
-            Collider2D[] collider = Physics2D.OverlapCircleAll(positionToCheck, 0.15f, layerMask);
-            return collider.Length > 0;
+            Vector2 positionToCheck = playerRb.position;
+            isGrounded = Physics2D.OverlapCircle(positionToCheck + bottomOffset, groundCheckRadius, layerMask);
         }
-        return false;
     }
 
     bool IsTouchingWall() {
-        return WallCheck() != 0;
+        return wallInfo != 0;
     }
 
-    int WallCheck() {
+    void WallCheck() {
         int layerMask = LayerMask.GetMask("Wall");
-        RaycastHit2D[] hits;
         Vector2 positionToCheck = playerRb.position;
-        Vector2 upCheck = positionToCheck;
-        upCheck.y += (playerCollider.size.y / 2 + 0.02f);
-        Vector2 downCheck = positionToCheck;
-        downCheck.y -= (playerCollider.size.y / 2 + 0.02f);
-        float checkDistance = playerCollider.size.x / 2 + 0.02f;
-        hits = Physics2D.RaycastAll(upCheck, new Vector2 (1, 0), checkDistance, layerMask);
-        if(hits.Length > 0)
-            return 1;   //Wall to the right
-        hits = Physics2D.RaycastAll(downCheck, new Vector2 (1, 0), checkDistance, layerMask);
-        if(hits.Length > 0)
-            return 1;   //Wall to the right
-        hits = Physics2D.RaycastAll(upCheck, new Vector2 (-1, 0), checkDistance, layerMask);
-        if(hits.Length > 0)
-            return -1;  //Wall to the left
-        hits = Physics2D.RaycastAll(downCheck, new Vector2 (-1, 0), checkDistance, layerMask);
-        if(hits.Length > 0)
-            return -1;  //Wall to the left
-        return 0;   //No wall
+        bool wallLeft = Physics2D.OverlapCircle(positionToCheck + leftOffset, wallCheckRadius, layerMask);
+        bool wallRight = Physics2D.OverlapCircle(positionToCheck + rightOffset, wallCheckRadius, layerMask);
+        wallInfo =  wallLeft ? -1:
+                    wallRight ? 1:
+                                0;
     }
 
     /*
@@ -373,7 +352,7 @@ public class SpiritMovement : MonoBehaviour
 
     public void UnLock() {
         this.isLocked = false;
-        if(!IsGrounded()) {
+        if(!isGrounded) {
             flyTimer = 0;
             flying = true;
         }
@@ -417,6 +396,15 @@ public class SpiritMovement : MonoBehaviour
     void RemoveIndex(int i) {
         delayQ.RemoveAt(i);
         inputQ.RemoveAt(i);
+    }
+    void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+
+        Vector2 positionToDraw = transform.position;
+
+        Gizmos.DrawWireSphere(positionToDraw  + bottomOffset, groundCheckRadius);
+        Gizmos.DrawWireSphere(positionToDraw + rightOffset, wallCheckRadius);
+        Gizmos.DrawWireSphere(positionToDraw + leftOffset, wallCheckRadius);
     }
 
     /*

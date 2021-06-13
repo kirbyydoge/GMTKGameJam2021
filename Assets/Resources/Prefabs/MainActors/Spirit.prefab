@@ -198,8 +198,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1.8, y: 3.6}
+  m_Offset: {x: -0.083103806, y: -0.084751055}
+  m_Size: {x: 1.4177251, y: 4.6535816}
   m_Direction: 0
 --- !u!50 &6340360418822677529
 Rigidbody2D:
@@ -250,6 +250,11 @@ MonoBehaviour:
   circularForce: 10
   minCircularLength: 4
   circularTransactionSmoothing: 0.95
+  bottomOffset: {x: -0.05, y: -0.7}
+  rightOffset: {x: 0.365, y: 0}
+  leftOffset: {x: -0.45, y: 0}
+  groundCheckRadius: 0.15
+  wallCheckRadius: 0.15
 --- !u!232 &6340360418822677535
 DistanceJoint2D:
   m_ObjectHideFlags: 0

@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class SpikeActions : MonoBehaviour
 {
@@ -32,7 +34,8 @@ public class SpikeActions : MonoBehaviour
     void HandlePlayerTrigger() {
         switch(playerAction) {
         case SpikeActionType.Damage:
-            //Function calls, calculations, flag operations etc.
+                SceneManager.LoadScene("BoraScene");
+               
             break;
         case SpikeActionType.Kill:
             //Function calls, calculations, flag operations etc.

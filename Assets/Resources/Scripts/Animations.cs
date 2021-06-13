@@ -20,7 +20,7 @@ public class Animations : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Mathf.Round(playerRb.velocity.x)+" "+Mathf.Round(playerRb.velocity.y));
+       
         if(Mathf.Round(playerRb.velocity.x)>errorNumber){
             transform.localRotation = Quaternion.Euler(0, 0, 0);
             if(Mathf.Round(playerRb.velocity.y)>errorNumber||Mathf.Round(playerRb.velocity.y)<-errorNumber){

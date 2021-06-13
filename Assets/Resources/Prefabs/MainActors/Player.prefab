@@ -97,7 +97,7 @@ MonoBehaviour:
   wallSlowdownSmoothing: 0
   dashLength: 4
   dashDuration: 0.25
-  dashCooldown: 0.1
+  dashCooldown: 0.6
   swingJumpAmplification: 2
   spiritDelay: 0.5
   circularForce: 10

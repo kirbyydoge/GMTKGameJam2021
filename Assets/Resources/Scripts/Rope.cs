@@ -47,7 +47,6 @@ public class Rope : MonoBehaviour
         }
         HingeJoint2D hingeJoint;
         Rigidbody2D nextSegmentrb;
-        DistanceJoint2D  distJoint;
         //Connect spirit to first rope segment
         GameObject playerObj = GameObject.Find("Spirit");
         spiritMovement = playerObj.GetComponent<SpiritMovement>();

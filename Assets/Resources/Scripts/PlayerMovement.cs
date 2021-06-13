@@ -128,8 +128,10 @@ public class PlayerMovement : MonoBehaviour
             if(spiritDistance >= circularJoint.distance * circularTransactionSmoothing) {
                 velocity.x = playerRb.velocity.x;
                 velocity.y = playerRb.velocity.y;
-                circularJoint.distance = spiritDistance;
-                circularJoint.enabled = wallInfo == 0;
+                if(wallInfo == 0) {
+                    circularJoint.distance = spiritDistance;
+                    circularJoint.enabled = true;
+                }
             } else {
                 circularJoint.enabled = false;
             }
@@ -270,6 +272,7 @@ public class PlayerMovement : MonoBehaviour
             circularMovement = false;
             spiritRb.AddForce(pushDirection * pushForce, ForceMode2D.Impulse); 
         }
+
     }
 
     void GroundCheck() {
@@ -277,7 +280,7 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = false;
         }
         if(playerRb.velocity.y <= 0.1f) {
-            int layerMask = LayerMask.GetMask("Ground");
+            int layerMask = LayerMask.GetMask("Ground", "Wall");
             Vector2 positionToCheck = playerRb.position;
             isGrounded = Physics2D.OverlapCircle(positionToCheck + bottomOffset, groundCheckRadius, layerMask);
         }
@@ -313,7 +316,7 @@ public class PlayerMovement : MonoBehaviour
             circularMovement = true;
             anchorPosition = position;
             circularJoint.connectedAnchor = position;
-            circularJoint.distance = ropeLength * (1 - segmentID / numSegments);
+            circularJoint.distance = Mathf.Max(ropeLength * (1 - segmentID / numSegments), minCircularLength);
         } else {
             circularJoint.distance = ropeLength;
         }
@@ -336,6 +339,7 @@ public class PlayerMovement : MonoBehaviour
             this.circularJoint.connectedAnchor = spiritRb.position;
             this.circularJoint.distance = ropeLength;
         }
+        this.curSegmment = -1;
         this.circularMovement = circularMovement || spirit_lock;
         this.circularJoint.enabled = this.circularMovement;
     }

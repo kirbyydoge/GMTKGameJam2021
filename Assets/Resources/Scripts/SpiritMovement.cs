@@ -78,7 +78,7 @@ public class SpiritMovement : MonoBehaviour
     private InputVars curInput;
     private bool isLocked;
     private bool flying;
-
+    private Vector2 lastCheck;
     private int wallInfo;
 
 
@@ -93,7 +93,7 @@ public class SpiritMovement : MonoBehaviour
         circularJoint.enableCollision = true;
         ropeLength = GameObject.Find("Rope").GetComponent<Rope>().ropeLength;
         numSegments = GameObject.Find("Rope").GetComponent<Rope>().numSegments;
-        curSegmment = -1;
+        curSegmment = numSegments;
         wallKick = false;
         dashAvailable = true;
         jumpAvailable = false;
@@ -118,7 +118,7 @@ public class SpiritMovement : MonoBehaviour
 
         if(isJumping) {
             velocity.y = jumpSpeed;
-        } else if(isJumpingPast) {
+        } else if(isJumpingPast && !isJumping) {
             velocity.y *= jumpStopSmoothing;
         }
 
@@ -129,10 +129,14 @@ public class SpiritMovement : MonoBehaviour
         }
 
         if(circularMovement && !isGrounded) {
-            velocity.x = playerRb.velocity.x;
-            velocity.y = playerRb.velocity.y;
-            if((anchorPosition - playerRb.position).magnitude >= circularJoint.distance * circularTransactionSmoothing) {
-                circularJoint.enabled = wallInfo == 0;
+            float spiritDistance = (anchorPosition - playerRb.position).magnitude;
+            if(spiritDistance >= circularJoint.distance * circularTransactionSmoothing) {
+                velocity.x = playerRb.velocity.x;
+                velocity.y = playerRb.velocity.y;
+                if(wallInfo == 0) {
+                    circularJoint.distance = spiritDistance;
+                    circularJoint.enabled = true;
+                }
             } else {
                 circularJoint.enabled = false;
             }
@@ -165,6 +169,10 @@ public class SpiritMovement : MonoBehaviour
             } else {
                 velocity.y *= wallSlowdownSmoothing;
             }
+        }
+
+        if((playerRb.position - spiritRb.position).magnitude  > ropeLength * 1.1f) {
+            velocity = Vector2.zero;
         }
 
         playerRb.velocity = velocity;
@@ -260,7 +268,7 @@ public class SpiritMovement : MonoBehaviour
             isGrounded = false;
         }
         if(playerRb.velocity.y <= 0.1f) {
-            int layerMask = LayerMask.GetMask("Ground");
+            int layerMask = LayerMask.GetMask("Ground", "Wall");
             Vector2 positionToCheck = playerRb.position;
             isGrounded = Physics2D.OverlapCircle(positionToCheck + bottomOffset, groundCheckRadius, layerMask);
         }
@@ -296,7 +304,7 @@ public class SpiritMovement : MonoBehaviour
             circularMovement = true;
             anchorPosition = position;
             circularJoint.connectedAnchor = position;
-            circularJoint.distance = ropeLength * (1 - segmentID / numSegments);
+            circularJoint.distance = Mathf.Max(ropeLength * (segmentID / numSegments), minCircularLength);
         } else {
             circularJoint.distance = ropeLength;
         }
@@ -304,10 +312,11 @@ public class SpiritMovement : MonoBehaviour
 
     public bool RayCastControl(Vector2 position) {
         int layerMask = LayerMask.GetMask("Wall", "Ground");
+        lastCheck = position;
         Collider2D collider = Physics2D.OverlapCircle(position, 0.5f, layerMask);
         if(collider != null) {
             float center = position.x - collider.transform.position.x;
-            float angle = Vector2.SignedAngle(position - playerRb.position, spiritRb.position - position);
+            float angle = Vector2.SignedAngle(position - playerRb.position, spiritRb.position - playerRb.position);
             return center * angle > 0;
         }
         return false;
@@ -318,6 +327,7 @@ public class SpiritMovement : MonoBehaviour
             this.circularJoint.connectedAnchor = spiritRb.position;
             this.circularJoint.distance = ropeLength;
         }
+        this.curSegmment = numSegments;
         this.circularMovement = circularMovement;
         this.circularJoint.enabled = this.circularMovement;
     }
@@ -326,7 +336,6 @@ public class SpiritMovement : MonoBehaviour
         for(int i = 0; i < hits.Length; i++) {
             RaycastHit2D hit = hits[i];
             Renderer rend = hit.transform.GetComponent<Renderer>();
-
             if (rend)
             {
                 rend.material.shader = Shader.Find("Transparent/Diffuse");
@@ -402,6 +411,7 @@ public class SpiritMovement : MonoBehaviour
 
         Vector2 positionToDraw = transform.position;
 
+        Gizmos.DrawWireSphere(lastCheck, 0.5f);
         Gizmos.DrawWireSphere(positionToDraw  + bottomOffset, groundCheckRadius);
         Gizmos.DrawWireSphere(positionToDraw + rightOffset, wallCheckRadius);
         Gizmos.DrawWireSphere(positionToDraw + leftOffset, wallCheckRadius);

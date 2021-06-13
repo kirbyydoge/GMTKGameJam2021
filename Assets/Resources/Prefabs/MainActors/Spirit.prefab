@@ -47,7 +47,7 @@ MonoBehaviour:
   ropeLength: 10
   ropeActualWidth: 0.35
   ropeVisualWidth: 0.25
-  numSegments: 25
+  numSegments: 15
   lineSmoothness: 10
 --- !u!120 &6340360417692611970
 LineRenderer:
@@ -248,7 +248,7 @@ MonoBehaviour:
   dashCooldown: 0.6
   spiritDelay: 0.5
   circularForce: 10
-  minCircularLength: 4
+  minCircularLength: 3
   circularTransactionSmoothing: 0.95
   bottomOffset: {x: -0.05, y: -0.65}
   rightOffset: {x: 0.37, y: 0}

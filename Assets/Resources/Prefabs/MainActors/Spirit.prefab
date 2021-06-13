@@ -245,7 +245,7 @@ MonoBehaviour:
   wallSlowdownSmoothing: 0
   dashLength: 4
   dashDuration: 0.25
-  dashCooldown: 0.1
+  dashCooldown: 1
   spiritDelay: 0.7
   circularForce: 10
   minCircularLength: 4

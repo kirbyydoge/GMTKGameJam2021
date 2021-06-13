@@ -130,22 +130,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4442312954382814489, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: m_Size.x
-      value: 1.5220684
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814489, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: m_Size.y
-      value: 4.6746635
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814489, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: m_Offset.x
-      value: -0.14879018
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814489, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: m_Offset.y
-      value: -0.06645799
-      objectReference: {fileID: 0}
     - target: {fileID: 4442312954382814491, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
       propertyPath: m_Name
       value: Player
@@ -193,34 +177,6 @@ PrefabInstance:
     - target: {fileID: 4442312954382814492, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: leftOffset.x
-      value: -0.36
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: rightOffset.x
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: bottomOffset.x
-      value: -0.06
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: bottomOffset.y
-      value: -0.72
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: wallCheckRadius
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: groundCheckRadius
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: swingJumpAmplification
-      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
@@ -342,46 +298,6 @@ PrefabInstance:
     - target: {fileID: 6340360418822677526, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
       propertyPath: m_Name
       value: Spirit
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677528, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: m_Size.x
-      value: 1.4177251
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677528, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: m_Size.y
-      value: 4.6535816
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677528, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: m_Offset.x
-      value: -0.083103806
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677528, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: m_Offset.y
-      value: -0.084751055
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677532, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: leftOffset.x
-      value: -0.45
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677532, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: rightOffset.x
-      value: 0.365
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677532, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: bottomOffset.x
-      value: -0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677532, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: bottomOffset.y
-      value: -0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677532, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: wallCheckRadius
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 6340360418822677532, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
-      propertyPath: groundCheckRadius
-      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 6340360418822677533, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
       propertyPath: m_RootOrder

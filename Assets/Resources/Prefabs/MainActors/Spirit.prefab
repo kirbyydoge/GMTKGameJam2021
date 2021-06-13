@@ -236,7 +236,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxMoveSpeed: 5
   stopSmoothing: 0.31
-  jumpHeight: 7
+  jumpHeight: 6
   jumpDuration: 0.4
   jumpStopSmoothing: 0.69
   wallKickAmplitude: 1.5

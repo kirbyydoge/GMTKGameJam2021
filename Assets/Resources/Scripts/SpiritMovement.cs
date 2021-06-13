@@ -241,12 +241,12 @@ public class SpiritMovement : MonoBehaviour
             dashAvailable = false;
             dashDirection = userInputMoveDirection;
             dashTime = 0;
-        } else if(!isGrounded && wallInfo != 0 && key_jumpDown) {
+        } else if(!isGrounded && wallInfo != 0 && key_jump) {
             wallKick = true;
             jumpAvailable = false;
             wallKickDirection = -wallInfo;
             wallKickTime = 0;
-        } else if(jumpAvailable && key_jumpDown) {
+        } else if(jumpAvailable && key_jump) {
             isJumping = true;
             jumpAvailable = false;
             airTime = 0;

@@ -98,7 +98,6 @@ MonoBehaviour:
   dashLength: 4
   dashDuration: 0.25
   dashCooldown: 0.1
-  swingForce: 10
   swingJumpAmplification: 2
   spiritDelay: 0.5
   circularForce: 10

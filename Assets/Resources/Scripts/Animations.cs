@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,6 +31,15 @@ public class Animations : MonoBehaviour
             }
         }
         else if(Mathf.Round(playerRb.velocity.x)<-errorNumber){
+            transform.localRotation = Quaternion.Euler(0, 180, 0);
+            if(Mathf.Round(playerRb.velocity.y)>errorNumber||Mathf.Round(playerRb.velocity.y)<-errorNumber){
+                animPlayer.SetInteger("AnimationState",2);
+            }
+            else{
+                animPlayer.SetInteger("AnimationState",1);
+            }
+        }
+        else{
             transform.localRotation = Quaternion.Euler(0, 180, 0);
             if(Mathf.Round(playerRb.velocity.y)>errorNumber||Mathf.Round(playerRb.velocity.y)<-errorNumber){
                 animPlayer.SetInteger("AnimationState",2);

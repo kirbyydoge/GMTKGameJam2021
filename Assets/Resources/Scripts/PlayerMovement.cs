@@ -26,12 +26,14 @@ public class PlayerMovement : MonoBehaviour
     public float dashDuration = 0.25f;
     public float dashCooldown = 0.1f;
     public float swingForce = 10f;
+    public float swingJumpAmplification = 2f;
     public float spiritDelay = 0.5f;
     public float circularForce = 10f;
     public float minCircularLength = 4f;
     [Range(0, 1)] public float circularTransactionSmoothing = 0.95f;
 
     //State Variables
+    private Vector2 anchorPosition;
     private bool mouse_fireDown;
     private bool mouse_fire;
     private bool key_jump;
@@ -48,6 +50,7 @@ public class PlayerMovement : MonoBehaviour
     private bool key_lock;
     private bool spirit_lock;
     private bool circularMovement;
+    private bool flying;
     private float dashDirection;
     private float userInputMoveDirection;
     private float objectMoveDirection;
@@ -59,9 +62,9 @@ public class PlayerMovement : MonoBehaviour
     private float dashTime;
     private float dashSpeed;
     private float ropeLength;
+    private float flyTimer;
     private int numSegments;
     private int wallKickDirection;
-    private Vector2 anchorPosition;
     private int curSegmment;
 
     void Start()
@@ -95,7 +98,11 @@ public class PlayerMovement : MonoBehaviour
 
         Vector2 velocity = playerRb.velocity;
 
-        velocity.x = maxMoveSpeed * userInputMoveDirection;
+        if(flying) {
+
+        } else {
+            velocity.x = maxMoveSpeed * userInputMoveDirection;
+        }
 
         if(isJumping) {
             velocity.y = jumpSpeed;
@@ -193,6 +200,13 @@ public class PlayerMovement : MonoBehaviour
             jumpAvailable = isGrounded || (wallInfo != 0 && objectMoveDirection == wallInfo);
         }
 
+        if(flying) {
+            flyTimer += Time.deltaTime;
+            if(flyTimer > spiritDelay) {
+                flying = !isGrounded || wallInfo != 0 || userInputMoveDirection != 0;
+            }
+        }
+
         //Handle Input and Determine Next State
 
         key_jumpDown = Input.GetKeyDown("space");
@@ -234,9 +248,14 @@ public class PlayerMovement : MonoBehaviour
         } else if(spirit_lock && !key_lock) {
             spiritRb.constraints = RigidbodyConstraints2D.FreezeRotation;
             spiritMovement.UnLock();
+            Vector2 pushDirection = (playerRb.position + playerRb.velocity * swingJumpAmplification - spiritRb.position).normalized;
+            float pushForce = playerRb.velocity.magnitude * swingJumpAmplification / spiritRb.mass;
             spirit_lock = false;
+            flying = true;
+            flyTimer = 0f;
             circularJoint.enabled = false;
             circularMovement = false;
+            spiritRb.AddForce(pushDirection * pushForce, ForceMode2D.Impulse); 
         }
     }
 

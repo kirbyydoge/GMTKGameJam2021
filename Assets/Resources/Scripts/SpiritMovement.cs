@@ -46,7 +46,6 @@ public class SpiritMovement : MonoBehaviour
     private bool key_lockDown;
     private bool key_lock;
     private bool key_dashDown;
-    private bool spirit_lock;
     private bool circularMovement;
     private float dashDirection;
     private float userInputMoveDirection;
@@ -59,6 +58,7 @@ public class SpiritMovement : MonoBehaviour
     private float dashTime;
     private float dashSpeed;
     private float ropeLength;
+    private float flyTimer;
     private int numSegments;
     private int wallKickDirection;
     private Vector2 anchorPosition;
@@ -68,6 +68,8 @@ public class SpiritMovement : MonoBehaviour
     private bool execute;
     private InputVars curInput;
     private bool isLocked;
+    private bool flying;
+
 
     void Start()
     {
@@ -83,8 +85,7 @@ public class SpiritMovement : MonoBehaviour
         curSegmment = -1;
         wallKick = false;
         dashAvailable = true;
-        jumpAvailable = true;
-        spirit_lock = false;
+        jumpAvailable = false;
         circularMovement = false;
         isLocked = false;
         jumpSpeed = jumpHeight / jumpDuration;
@@ -102,7 +103,9 @@ public class SpiritMovement : MonoBehaviour
 
         Vector2 velocity = playerRb.velocity;
 
-        velocity.x = maxMoveSpeed * userInputMoveDirection;
+        if(!flying) {
+            velocity.x = maxMoveSpeed * userInputMoveDirection;
+        }
 
         if(isJumping) {
             velocity.y = jumpSpeed;
@@ -193,6 +196,13 @@ public class SpiritMovement : MonoBehaviour
             wallKickTime += Time.deltaTime;
             if (wallKickTime > wallKickDuration) {
                 wallKick = false;
+            }
+        }
+
+        if(flying) {
+            flyTimer += Time.deltaTime;
+            if(flyTimer > spiritDelay) {
+                flying = !isGrounded || wallInfo != 0 || userInputMoveDirection != 0;
             }
         }
 
@@ -330,7 +340,7 @@ public class SpiritMovement : MonoBehaviour
             this.circularJoint.connectedAnchor = spiritRb.position;
             this.circularJoint.distance = ropeLength;
         }
-        this.circularMovement = circularMovement || spirit_lock;
+        this.circularMovement = circularMovement;
         this.circularJoint.enabled = this.circularMovement;
     }
 
@@ -355,11 +365,19 @@ public class SpiritMovement : MonoBehaviour
     }
 
     public void Lock() {
+        wallKick = false;
+        dashAvailable = true;
+        jumpAvailable = false;
+        circularMovement = false;
         this.isLocked = true;
     }
 
     public void UnLock() {
         this.isLocked = false;
+        if(!IsGrounded()) {
+            flyTimer = 0;
+            flying = true;
+        }
     }
 
     void UpdateInputVars() {

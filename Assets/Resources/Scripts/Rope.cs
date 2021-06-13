@@ -22,7 +22,7 @@ public class Rope : MonoBehaviour
     private float segmentLength;
     void Start()
     {
-        ropeSegmentPrefab = (GameObject) Resources.Load("Prefabs/RopeSegment");
+        ropeSegmentPrefab = (GameObject) Resources.Load("Prefabs/MainActors/RopeSegment");
         debuggerPrefab = (GameObject) Resources.Load("Prefabs/Debugger");
         lineRenderer = GetComponent<LineRenderer>();
         segmentCollisions = new bool[numSegments];

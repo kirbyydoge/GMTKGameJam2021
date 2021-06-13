@@ -246,14 +246,14 @@ MonoBehaviour:
   dashLength: 4
   dashDuration: 0.25
   dashCooldown: 0.6
-  spiritDelay: 0.7
+  spiritDelay: 0.5
   circularForce: 10
   minCircularLength: 4
   circularTransactionSmoothing: 0.95
-  bottomOffset: {x: -0.05, y: -0.7}
-  rightOffset: {x: 0.365, y: 0}
-  leftOffset: {x: -0.45, y: 0}
-  groundCheckRadius: 0.15
+  bottomOffset: {x: -0.05, y: -0.65}
+  rightOffset: {x: 0.37, y: 0}
+  leftOffset: {x: -0.455, y: 0}
+  groundCheckRadius: 0.28
   wallCheckRadius: 0.15
 --- !u!232 &6340360418822677535
 DistanceJoint2D:

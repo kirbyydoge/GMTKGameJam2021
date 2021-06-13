@@ -104,6 +104,9 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        GroundCheck();
+        WallCheck();
+
         Vector2 velocity = playerRb.velocity;
 
         if(!flying) {

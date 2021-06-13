@@ -34,6 +34,7 @@ public class SpikeActions : MonoBehaviour
     void HandlePlayerTrigger() {
         switch(playerAction) {
         case SpikeActionType.Damage:
+                
                 SceneManager.LoadScene("BoraScene");
                
             break;

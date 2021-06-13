@@ -104,10 +104,10 @@ MonoBehaviour:
   minCircularLength: 4
   circularTransactionSmoothing: 0.95
   controldelay: 0
-  bottomOffset: {x: -0.06, y: -0.72}
-  rightOffset: {x: 0.25, y: 0}
-  leftOffset: {x: -0.36, y: 0}
-  groundCheckRadius: 0.15
+  bottomOffset: {x: -0.06, y: -0.65}
+  rightOffset: {x: 0.27, y: 0}
+  leftOffset: {x: -0.37, y: 0}
+  groundCheckRadius: 0.25
   wallCheckRadius: 0.15
 --- !u!232 &4442312954382814482
 DistanceJoint2D:

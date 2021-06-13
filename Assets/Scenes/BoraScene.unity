@@ -1862,10 +1862,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4442312954382814482, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4442312954382814491, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1913,10 +1909,6 @@ PrefabInstance:
     - target: {fileID: 4442312954382814492, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4442312954382814493, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
-      propertyPath: dashCooldown
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 430d8d34d50ae984fbb103cd04280dab, type: 3}
@@ -3501,6 +3493,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6340360417692611971, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
+      propertyPath: numSegments
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 6340360418822677526, guid: 7511f7dc89228094fb4b039f0c2c5f2c, type: 3}
       propertyPath: m_Name
       value: Spirit

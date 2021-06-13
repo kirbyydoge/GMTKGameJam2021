@@ -76,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
     private int wallKickDirection;
     private int curSegmment;
     private int wallInfo;
+    private Vector2 lastCheck;
 
     void Start()
     {
@@ -104,9 +105,6 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        GroundCheck();
-        WallCheck();
-
         Vector2 velocity = playerRb.velocity;
 
         if(!flying) {
@@ -126,9 +124,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if(circularMovement && !isGrounded) {
-            velocity.x = playerRb.velocity.x;
-            velocity.y = playerRb.velocity.y;
-            if((anchorPosition - playerRb.position).magnitude >= circularJoint.distance * circularTransactionSmoothing) {
+            float spiritDistance = (anchorPosition - playerRb.position).magnitude;
+            if(spiritDistance >= circularJoint.distance * circularTransactionSmoothing) {
+                velocity.x = playerRb.velocity.x;
+                velocity.y = playerRb.velocity.y;
+                circularJoint.distance = spiritDistance;
                 circularJoint.enabled = wallInfo == 0;
             } else {
                 circularJoint.enabled = false;
@@ -162,6 +162,10 @@ public class PlayerMovement : MonoBehaviour
             } else {
                 velocity.y *= wallSlowdownSmoothing;
             }
+        }
+
+        if((playerRb.position - spiritRb.position).magnitude  > ropeLength * 1.1f) {
+            velocity = Vector2.zero;
         }
 
         playerRb.velocity = velocity;
@@ -260,7 +264,7 @@ public class PlayerMovement : MonoBehaviour
             Vector2 pushDirection = (playerRb.position + playerRb.velocity * swingJumpAmplification - spiritRb.position).normalized;
             float pushForce = playerRb.velocity.magnitude * swingJumpAmplification / spiritRb.mass;
             spirit_lock = false;
-            flying = true;
+            flying = circularJoint.enabled;
             flyTimer = 0f;
             circularJoint.enabled = false;
             circularMovement = false;
@@ -317,10 +321,11 @@ public class PlayerMovement : MonoBehaviour
 
     public bool RayCastControl(Vector2 position) {
         int layerMask = LayerMask.GetMask("Wall", "Ground");
+        lastCheck = position;
         Collider2D collider = Physics2D.OverlapCircle(position, 0.5f, layerMask);
         if(collider != null) {
             float center = position.x - collider.transform.position.x;
-            float angle = Vector2.SignedAngle(position - playerRb.position, spiritRb.position - position);
+            float angle = Vector2.SignedAngle(position - playerRb.position, spiritRb.position - playerRb.position);
             return center * angle > 0;
         }
         return false;
@@ -354,6 +359,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector2 positionToDraw = transform.position;
 
+        Gizmos.DrawWireSphere(lastCheck, 0.5f);
         Gizmos.DrawWireSphere(positionToDraw  + bottomOffset, groundCheckRadius);
         Gizmos.DrawWireSphere(positionToDraw + rightOffset, wallCheckRadius);
         Gizmos.DrawWireSphere(positionToDraw + leftOffset, wallCheckRadius);

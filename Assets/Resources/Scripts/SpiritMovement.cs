@@ -289,7 +289,7 @@ public class SpiritMovement : MonoBehaviour
     */
     public void SetCircularAnchor(Vector2 position, int segmentID) {
         float newDistance = (position - playerRb.position).magnitude;
-        if  (   (!key_lock && (segmentID > curSegmment)) ||
+        if  (   (!key_lock && (segmentID < curSegmment)) ||
                 (RayCastControl(position))
             ) {
             curSegmment = segmentID;

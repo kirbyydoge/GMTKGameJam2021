@@ -28,7 +28,7 @@ public class Rope : MonoBehaviour
         segmentCollisions = new bool[numSegments];
         lineRenderer.numCornerVertices = lineSmoothness;
         lineRenderer.useWorldSpace = true;
-        lineRenderer.positionCount = numSegments;
+        lineRenderer.positionCount = numSegments+1;
         lineRenderer.startWidth = ropeVisualWidth;
         lineRenderer.endWidth = ropeVisualWidth;
         ropeSegments = new GameObject[numSegments];
@@ -53,34 +53,20 @@ public class Rope : MonoBehaviour
         spiritMovement = playerObj.GetComponent<SpiritMovement>();
         spiritRb = playerObj.GetComponent<Rigidbody2D>();
         ropeSegments[0].AddComponent<HingeJoint2D>();
-        ropeSegments[0].AddComponent<DistanceJoint2D>();
         hingeJoint = ropeSegments[0].GetComponents<HingeJoint2D>()[0];
         nextSegmentrb = playerObj.GetComponent<Rigidbody2D>();
-        ConnectHingeToRigid(hingeJoint, nextSegmentrb, segmentLength);
-        distJoint = ropeSegments[0].GetComponents<DistanceJoint2D>()[0];
-        distJoint.anchor  = hingeJoint.anchor;
-        distJoint.connectedAnchor = hingeJoint.connectedAnchor;
-        distJoint.connectedBody = nextSegmentrb;
-        distJoint.autoConfigureConnectedAnchor = false;
-        distJoint.distance = 0;
-        distJoint.enabled = true;
+        ConnectHingeToRigid(hingeJoint, nextSegmentrb, 0);
         //Connect 2nd end of first rope to next rope segment
         hingeJoint = ropeSegments[0].GetComponents<HingeJoint2D>()[1];
         nextSegmentrb = ropeSegments[1].GetComponent<Rigidbody2D>();
         ConnectHingeToRigid(hingeJoint, nextSegmentrb, segmentLength);
-        distJoint = ropeSegments[0].GetComponents<DistanceJoint2D>()[1];
-        distJoint.anchor  = hingeJoint.anchor;
-        distJoint.connectedAnchor = hingeJoint.connectedAnchor;
-        distJoint.connectedBody = nextSegmentrb;
-        distJoint.autoConfigureConnectedAnchor = false;
-        distJoint.distance = 0;
-        distJoint.enabled = true;
         //Connect spirit to first rope segment
         //Connect rope segments together
         for(int i = 1; i < numSegments - 1; i++) {
             hingeJoint = ropeSegments[i].GetComponent<HingeJoint2D>();
             nextSegmentrb = ropeSegments[i+1].GetComponent<Rigidbody2D>();
             ConnectHingeToRigid(hingeJoint, nextSegmentrb, segmentLength);
+            /*
             distJoint = ropeSegments[i].GetComponent<DistanceJoint2D>();
             distJoint.anchor  = hingeJoint.anchor;
             distJoint.connectedAnchor = hingeJoint.connectedAnchor;
@@ -88,6 +74,7 @@ public class Rope : MonoBehaviour
             distJoint.autoConfigureConnectedAnchor = false;
             distJoint.distance = 0;
             distJoint.enabled = true;
+            */
         }
         //Connect last rope segment to player
         playerObj = GameObject.Find("Player");
@@ -141,10 +128,11 @@ public class Rope : MonoBehaviour
     }
 
     void DrawRope() {
-        Vector3[] points = new Vector3[numSegments];
+        Vector3[] points = new Vector3[numSegments+1];
         for(int i = 0; i < numSegments; i++) {
             points[i] = ropeSegments[i].transform.position;
         }
+        points[numSegments] = playerRb.position;
         lineRenderer.SetPositions(points);
     }
 

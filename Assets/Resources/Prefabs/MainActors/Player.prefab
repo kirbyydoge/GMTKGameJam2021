@@ -97,12 +97,12 @@ MonoBehaviour:
   wallSlowdownSmoothing: 0
   dashLength: 4
   dashDuration: 0.25
-  dashCooldown: 0.6
+  dashCooldown: 1
   swingJumpAmplification: 2
   spiritDelay: 0.5
   circularForce: 10
   minCircularLength: 4
-  circularTransactionSmoothing: 0.95
+  circularTransactionSmoothing: 0.985
   controldelay: 0
   bottomOffset: {x: -0.06, y: -0.65}
   rightOffset: {x: 0.27, y: 0}

@@ -284,8 +284,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxMoveSpeed: 5
   stopSmoothing: 0.31
-  jumpHeight: 2
-  jumpDuration: 0.31
+  jumpHeight: 7
+  jumpDuration: 0.4
   jumpStopSmoothing: 0.69
   wallKickAmplitude: 1.5
   wallKickJumpHeight: 2
@@ -295,8 +295,8 @@ MonoBehaviour:
   dashDuration: 0.25
   dashCooldown: 0.1
   swingForce: 10
-  spiritDelay: 0.5
-  circularForce: 5
+  spiritDelay: 0.7
+  circularForce: 10
   minCircularLength: 4
   circularTransactionSmoothing: 0.95
 --- !u!232 &6340360418822677535

@@ -24,7 +24,6 @@ public class SpiritMovement : MonoBehaviour
     public float dashLength = 5f;
     public float dashDuration = 0.25f;
     public float dashCooldown = 0.1f;
-    public float swingForce = 10f;
     public float spiritDelay = 0.5f;
     public float circularForce = 10f;
     public float minCircularLength = 4f;

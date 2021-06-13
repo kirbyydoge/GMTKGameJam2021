@@ -25,13 +25,12 @@ public class PlayerMovement : MonoBehaviour
     public float dashLength = 5f;
     public float dashDuration = 0.25f;
     public float dashCooldown = 0.1f;
-    public float swingForce = 10f;
     public float swingJumpAmplification = 2f;
     public float spiritDelay = 0.5f;
     public float circularForce = 10f;
     public float minCircularLength = 4f;
     [Range(0, 1)] public float circularTransactionSmoothing = 0.95f;
-
+    public float controldelay;
     //State Variables
     private Vector2 anchorPosition;
     private bool mouse_fireDown;
@@ -202,7 +201,7 @@ public class PlayerMovement : MonoBehaviour
 
         if(flying) {
             flyTimer += Time.deltaTime;
-            if(flyTimer > spiritDelay) {
+            if(flyTimer > controldelay) {
                 flying = !isGrounded || wallInfo != 0 || userInputMoveDirection != 0;
             }
         }
